@@ -1,102 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Our Little Adventures ❤️</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff8fb;color:#332a30}
-button,input,textarea{font:inherit}.hero{min-height:46vh;padding:70px 22px 55px;text-align:center;background:linear-gradient(135deg,#ffe5ee,#fff4df);position:relative;overflow:hidden}
-.heart{font-size:34px}.hero h1{font-size:clamp(42px,8vw,78px);margin:12px 0 8px;letter-spacing:-3px}.hero p{font-size:18px;color:#735f68;margin:0 auto;max-width:600px}.date{margin-top:22px;display:inline-block;background:#fff;border:1px solid #f1d8e1;border-radius:999px;padding:10px 17px;color:#8b5366}
-.wrap{max-width:1050px;margin:-35px auto 60px;padding:0 18px;position:relative}.card{background:#fff;border:1px solid #f0e2e7;border-radius:24px;box-shadow:0 15px 45px #8f526615;padding:24px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.stat{text-align:center;padding:18px;border-radius:18px;background:#fff8fa}.stat b{display:block;font-size:28px}.stat span{font-size:13px;color:#876e78}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}.toolbar input,.toolbar select,.add input,.add textarea{border:1px solid #eadbe1;background:#fff;border-radius:13px;padding:12px 14px;outline:none}.toolbar input{flex:1;min-width:190px}.btn{border:0;border-radius:13px;padding:12px 17px;background:#e85b7b;color:white;font-weight:700;cursor:pointer}.btn.secondary{background:#fff0f4;color:#a43e5a}.add{display:grid;grid-template-columns:1fr 180px auto;gap:10px;margin-bottom:22px}.list{display:grid;gap:11px}.item{display:flex;align-items:center;gap:13px;padding:16px;border:1px solid #eee1e6;border-radius:17px;background:#fff}.check{width:23px;height:23px;border-radius:50%;border:2px solid #e8a4b6;cursor:pointer;flex:none;display:grid;place-items:center}.done .check{background:#e85b7b;color:#fff}.done .check:after{content:"✓";font-size:13px}.item-main{flex:1}.item-main strong{display:block}.item-main small{color:#927b84}.done strong{text-decoration:line-through;color:#9b8d93}.delete{border:0;background:none;color:#bbaab0;cursor:pointer;font-size:18px}.section-title{margin:34px 0 14px;font-size:25px}.memory{border:2px dashed #ead7df;border-radius:20px;padding:28px;text-align:center;color:#927b84}.footer{text-align:center;color:#9a858e;padding:20px}.quote{text-align:center;font-size:18px;font-style:italic;color:#805665;margin:26px 0}
-@media(max-width:650px){.stats{grid-template-columns:1fr}.add{grid-template-columns:1fr}.hero{min-height:42vh}.hero h1{letter-spacing:-2px}}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#fff8fb;color:#332a30}
+button,input,select{font:inherit}.hero{padding:55px 20px;text-align:center;background:linear-gradient(135deg,#ffe4ee,#fff1d8)}
+.hero h1{font-size:clamp(40px,8vw,72px);letter-spacing:-3px;margin:8px}.hero p{color:#765f69}.wrap{max-width:950px;margin:-25px auto 50px;padding:0 16px}.card{background:white;border:1px solid #f0e1e7;border-radius:24px;padding:24px;box-shadow:0 15px 45px #8f526615}
+.hidden{display:none}.auth{max-width:430px;margin:25px auto}.auth h2{text-align:center}.field{display:grid;gap:7px;margin:12px 0}.field input{padding:13px;border:1px solid #eadbe1;border-radius:12px}.btn{border:0;border-radius:12px;padding:12px 17px;background:#e85b7b;color:white;font-weight:700;cursor:pointer}.btn.alt{background:#fff0f4;color:#a43e5a}.msg{text-align:center;color:#8a6572;min-height:24px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{text-align:center;background:#fff8fa;border-radius:17px;padding:17px}.stat b{display:block;font-size:27px}.stat small{color:#8b747d}.add{display:grid;grid-template-columns:1fr 160px auto;gap:9px;margin:20px 0}.add input,.add select,.search{padding:12px;border:1px solid #eadbe1;border-radius:12px}.search{width:100%;margin-bottom:10px}.item{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #eee1e6;border-radius:16px;margin:9px 0}.check{width:23px;height:23px;border:2px solid #e8a4b6;border-radius:50%;cursor:pointer;display:grid;place-items:center}.done .check{background:#e85b7b}.done .check:after{content:"✓";color:#fff;font-size:13px}.main{flex:1}.main strong{display:block}.main small{color:#927b84}.done strong{text-decoration:line-through;color:#9d9095}.del{border:0;background:none;color:#b9a9af;font-size:20px;cursor:pointer}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}.top span{color:#806974}.empty{text-align:center;padding:25px;color:#917b84}.note{text-align:center;font-style:italic;color:#805665;margin:22px}.footer{text-align:center;color:#9b858e}
+@media(max-width:650px){.stats{grid-template-columns:1fr}.add{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
-<section class="hero">
-  <div class="heart">♡</div>
-  <h1>Our Little Adventures</h1>
-  <p>A place for all the things we want to do, see, eat, explore and remember together.</p>
-  <div class="date">Made with love · just for us</div>
+<section class="hero"><div style="font-size:32px">♡</div><h1>Our Little Adventures</h1><p>A tiny corner of the internet for everything we want to do together.</p></section>
+<main class="wrap">
+<section id="authCard" class="card auth">
+<h2>Our private space ❤️</h2>
+<div class="field"><label>Email</label><input id="email" type="email" autocomplete="email"></div>
+<div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
+<button class="btn" style="width:100%" onclick="signIn()">Log in</button>
+<button class="btn alt" style="width:100%;margin-top:8px" onclick="signUp()">Create account</button>
+<p id="authMsg" class="msg"></p>
 </section>
 
-<main class="wrap">
-  <section class="card">
-    <div class="stats">
-      <div class="stat"><b id="total">0</b><span>things on our list</span></div>
-      <div class="stat"><b id="completed">0</b><span>adventures completed</span></div>
-      <div class="stat"><b id="progress">0%</b><span>bucket list progress</span></div>
-    </div>
-
-    <div class="quote">“Let’s collect moments, not things.” ♡</div>
-
-    <h2 class="section-title">Our bucket list</h2>
-    <div class="add">
-      <input id="newItem" placeholder="e.g. Watch a sunrise together 🌅">
-      <select id="newCategory">
-        <option>Travel</option><option>Food</option><option>Adventure</option><option>Date</option><option>Dream</option><option>Other</option>
-      </select>
-      <button class="btn" onclick="addItem()">Add</button>
-    </div>
-
-    <div class="toolbar">
-      <input id="search" placeholder="Search our list..." oninput="render()">
-      <select id="filter" onchange="render()">
-        <option value="all">All</option><option value="open">Not done</option><option value="done">Completed</option>
-      </select>
-      <button class="btn secondary" onclick="seed()">Add starter ideas</button>
-      <button class="btn secondary" onclick="clearDone()">Clear completed</button>
-    </div>
-
-    <div id="list" class="list"></div>
-
-    <h2 class="section-title">Our memories 📸</h2>
-    <div class="memory">
-      <p><strong>Coming soon...</strong></p>
-      <p>Add your favourite photos here when you connect this site to a free photo/database service.</p>
-    </div>
-  </section>
-</main>
-<div class="footer">Built for two people and a lifetime of stories. ❤️</div>
-
+<section id="app" class="card hidden">
+<div class="top"><div><strong>Our bucket list ❤️</strong><br><span id="who"></span></div><button class="btn alt" onclick="signOut()">Log out</button></div>
+<div class="stats"><div class="stat"><b id="total">0</b><small>things on our list</small></div><div class="stat"><b id="completed">0</b><small>completed</small></div><div class="stat"><b id="progress">0%</b><small>progress</small></div></div>
+<div class="note">“Let’s collect moments, not things.” ♡</div>
+<div class="add"><input id="text" placeholder="e.g. Watch a sunrise together 🌅"><select id="category"><option>Travel</option><option>Food</option><option>Adventure</option><option>Date</option><option>Dream</option><option>Other</option></select><button class="btn" onclick="addItem()">Add</button></div>
+<input id="search" class="search" placeholder="Search our adventures..." oninput="render()">
+<div id="list"></div>
+</section>
+</main><div class="footer">Made for two. ❤️</div>
 <script>
-const KEY="our-couple-bucket-list-v1";
-let items=JSON.parse(localStorage.getItem(KEY)||"[]");
-
-function save(){localStorage.setItem(KEY,JSON.stringify(items));render()}
-function addItem(){
- const text=document.getElementById("newItem").value.trim(), cat=document.getElementById("newCategory").value;
- if(!text)return;
- items.unshift({id:Date.now(),text,cat,done:false});document.getElementById("newItem").value="";save();
-}
-function toggle(id){const x=items.find(i=>i.id===id);if(x)x.done=!x.done;save()}
-function removeItem(id){items=items.filter(i=>i.id!==id);save()}
-function clearDone(){items=items.filter(i=>!i.done);save()}
-function seed(){
- const ideas=[
- ["Watch a sunrise together","Date"],["Take a spontaneous road trip","Adventure"],["Visit a place neither of us has been","Travel"],
- ["Cook a three-course dinner together","Food"],["Have a no-phone date","Date"],["Make a scrapbook of our memories","Dream"],
- ["Go stargazing","Adventure"],["Take silly photobooth pictures","Date"],["Try a new restaurant","Food"],["Plan our dream vacation","Travel"]
- ];
- ideas.forEach(([text,cat],n)=>{if(!items.some(i=>i.text===text))items.push({id:Date.now()+n,text,cat,done:false})});save();
-}
-function render(){
- const q=document.getElementById("search").value.toLowerCase(), f=document.getElementById("filter").value;
- const shown=items.filter(i=>(!q||i.text.toLowerCase().includes(q)||i.cat.toLowerCase().includes(q))&&(f==="all"||(f==="done"?i.done:!i.done)));
- document.getElementById("list").innerHTML=shown.length?shown.map(i=>`
- <div class="item ${i.done?"done":""}">
-   <div class="check" onclick="toggle(${i.id})"></div>
-   <div class="item-main"><strong>${escapeHtml(i.text)}</strong><small>${escapeHtml(i.cat)}</small></div>
-   <button class="delete" onclick="removeItem(${i.id})" aria-label="Delete">×</button>
- </div>`).join(""):`<div class="memory">Nothing here yet. Add your first little adventure. ♡</div>`;
- const done=items.filter(i=>i.done).length,total=items.length;
- document.getElementById("total").textContent=total;document.getElementById("completed").textContent=done;
- document.getElementById("progress").textContent=total?Math.round(done/total*100)+"%":"0%";
-}
-function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-document.getElementById("newItem").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});
-render();
+const SUPABASE_URL="https://cwnfdtrroesydrvceewp.supabase.co";
+const SUPABASE_KEY="sb_publishable_YVUyOo6IlEfkLdIFNxlTlg_LQHz2bHw";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let items=[], user=null;
+const $=id=>document.getElementById(id);
+function msg(t){$("authMsg").textContent=t}
+async function signUp(){const email=$("email").value.trim(),password=$("password").value;if(!email||password.length<6)return msg("Use an email and a password of at least 6 characters.");const {error}=await db.auth.signUp({email,password});msg(error?error.message:"Account created. Check your email if confirmation is enabled, then log in.");}
+async function signIn(){const email=$("email").value.trim(),password=$("password").value;const {error}=await db.auth.signInWithPassword({email,password});if(error)return msg(error.message);msg("")}
+async function signOut(){await db.auth.signOut()}
+async function load(){const {data,error}=await db.from("bucket_items").select("*").order("created_at",{ascending:false});if(error){alert(error.message);return}items=data||[];render()}
+async function addItem(){if(!user)return;const text=$("text").value.trim();if(!text)return;const {error}=await db.from("bucket_items").insert({text,category:$("category").value,completed:false});if(error)alert(error.message);else{$("text").value="";load()}}
+async function toggle(id,done){const {error}=await db.from("bucket_items").update({completed:!done}).eq("id",id);if(error)alert(error.message);else load()}
+async function removeItem(id){if(!confirm("Remove this adventure?"))return;const {error}=await db.from("bucket_items").delete().eq("id",id);if(error)alert(error.message);else load()}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function render(){const q=$("search").value.toLowerCase();const shown=items.filter(i=>!q||i.text.toLowerCase().includes(q)||i.category.toLowerCase().includes(q));$("list").innerHTML=shown.length?shown.map(i=>`<div class="item ${i.completed?"done":""}"><div class="check" onclick="toggle(${i.id},${i.completed})"></div><div class="main"><strong>${esc(i.text)}</strong><small>${esc(i.category)}</small></div><button class="del" onclick="removeItem(${i.id})">×</button></div>`).join(""):`<div class="empty">Nothing here yet. Add your first adventure. ♡</div>`;const d=items.filter(i=>i.completed).length,t=items.length;$("total").textContent=t;$("completed").textContent=d;$("progress").textContent=t?Math.round(d/t*100)+"%":"0%"}
+db.auth.onAuthStateChange(async (_event,session)=>{user=session?.user||null;$("authCard").classList.toggle("hidden",!!user);$("app").classList.toggle("hidden",!user);if(user){$("who").textContent=user.email;await load()}});
+(async()=>{const {data}=await db.auth.getSession();if(data.session){user=data.session.user;$("authCard").classList.add("hidden");$("app").classList.remove("hidden");$("who").textContent=user.email;await load()}})();
+$("text").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});
 </script>
-</body>
-</html>
+</body></html>
