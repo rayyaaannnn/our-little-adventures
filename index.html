@@ -24,6 +24,15 @@ button,input,select{font:inherit}.hero{padding:55px 20px;text-align:center;backg
 <p id="authMsg" class="msg"></p>
 </section>
 
+<section id="coupleCard" class="card auth hidden">
+<h2>Connect with your partner ❤️</h2>
+<p style="text-align:center;color:#8a6572">Create a shared code, or enter the one your partner made.</p>
+<div class="field"><label>Couple code</label><input id="coupleCode" placeholder="e.g. RAYANLOVE"></div>
+<button class="btn" style="width:100%" onclick="createCouple()">Create a new couple</button>
+<button class="btn alt" style="width:100%;margin-top:8px" onclick="joinCouple()">Join an existing couple</button>
+<p id="coupleMsg" class="msg"></p>
+</section>
+
 <section id="app" class="card hidden">
 <div class="top"><div><strong>Our bucket list ❤️</strong><br><span id="who"></span></div><button class="btn alt" onclick="signOut()">Log out</button></div>
 <div class="stats"><div class="stat"><b id="total">0</b><small>things on our list</small></div><div class="stat"><b id="completed">0</b><small>completed</small></div><div class="stat"><b id="progress">0%</b><small>progress</small></div></div>
@@ -37,20 +46,67 @@ button,input,select{font:inherit}.hero{padding:55px 20px;text-align:center;backg
 const SUPABASE_URL="https://cwnfdtrroesydrvceewp.supabase.co";
 const SUPABASE_KEY="sb_publishable_YVUyOo6IlEfkLdIFNxlTlg_LQHz2bHw";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let items=[], user=null;
+let items=[], user=null, coupleId=null;
 const $=id=>document.getElementById(id);
 function msg(t){$("authMsg").textContent=t}
+function coupleMsg(t){$("coupleMsg").textContent=t}
 async function signUp(){const email=$("email").value.trim(),password=$("password").value;if(!email||password.length<6)return msg("Use an email and a password of at least 6 characters.");const {error}=await db.auth.signUp({email,password});msg(error?error.message:"Account created. Check your email if confirmation is enabled, then log in.");}
 async function signIn(){const email=$("email").value.trim(),password=$("password").value;const {error}=await db.auth.signInWithPassword({email,password});if(error)return msg(error.message);msg("")}
-async function signOut(){await db.auth.signOut()}
+async function signOut(){coupleId=null;await db.auth.signOut()}
+async function checkCouple(){
+  const {data,error}=await db.rpc("get_my_couple");
+  if(error){alert(error.message);return}
+  coupleId=data||null;
+  if(coupleId){
+    $("coupleCard").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    await load();
+  }else{
+    $("coupleCard").classList.remove("hidden");
+    $("app").classList.add("hidden");
+  }
+}
+async function createCouple(){
+  const code=$("coupleCode").value.trim();
+  if(!code)return coupleMsg("Enter a code first.");
+  coupleMsg("");
+  const {data,error}=await db.rpc("create_couple",{code});
+  if(error)return coupleMsg(error.message);
+  coupleId=data;
+  await checkCouple();
+}
+async function joinCouple(){
+  const code=$("coupleCode").value.trim();
+  if(!code)return coupleMsg("Enter a code first.");
+  coupleMsg("");
+  const {data,error}=await db.rpc("join_couple",{code});
+  if(error)return coupleMsg(error.message);
+  coupleId=data;
+  await checkCouple();
+}
 async function load(){const {data,error}=await db.from("bucket_items").select("*").order("created_at",{ascending:false});if(error){alert(error.message);return}items=data||[];render()}
-async function addItem(){if(!user)return;const text=$("text").value.trim();if(!text)return;const {error}=await db.from("bucket_items").insert({text,category:$("category").value,completed:false});if(error)alert(error.message);else{$("text").value="";load()}}
+async function addItem(){if(!user||!coupleId)return;const text=$("text").value.trim();if(!text)return;const {error}=await db.from("bucket_items").insert({text,category:$("category").value,completed:false,couple_id:coupleId,user_id:user.id});if(error)alert(error.message);else{$("text").value="";load()}}
 async function toggle(id,done){const {error}=await db.from("bucket_items").update({completed:!done}).eq("id",id);if(error)alert(error.message);else load()}
 async function removeItem(id){if(!confirm("Remove this adventure?"))return;const {error}=await db.from("bucket_items").delete().eq("id",id);if(error)alert(error.message);else load()}
 function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 function render(){const q=$("search").value.toLowerCase();const shown=items.filter(i=>!q||i.text.toLowerCase().includes(q)||i.category.toLowerCase().includes(q));$("list").innerHTML=shown.length?shown.map(i=>`<div class="item ${i.completed?"done":""}"><div class="check" onclick="toggle(${i.id},${i.completed})"></div><div class="main"><strong>${esc(i.text)}</strong><small>${esc(i.category)}</small></div><button class="del" onclick="removeItem(${i.id})">×</button></div>`).join(""):`<div class="empty">Nothing here yet. Add your first adventure. ♡</div>`;const d=items.filter(i=>i.completed).length,t=items.length;$("total").textContent=t;$("completed").textContent=d;$("progress").textContent=t?Math.round(d/t*100)+"%":"0%"}
-db.auth.onAuthStateChange(async (_event,session)=>{user=session?.user||null;$("authCard").classList.toggle("hidden",!!user);$("app").classList.toggle("hidden",!user);if(user){$("who").textContent=user.email;await load()}});
-(async()=>{const {data}=await db.auth.getSession();if(data.session){user=data.session.user;$("authCard").classList.add("hidden");$("app").classList.remove("hidden");$("who").textContent=user.email;await load()}})();
+db.auth.onAuthStateChange(async (_event,session)=>{
+  user=session?.user||null;
+  $("authCard").classList.toggle("hidden",!!user);
+  if(!user){$("coupleCard").classList.add("hidden");$("app").classList.add("hidden");coupleId=null;return}
+  $("who").textContent=user.email;
+  await checkCouple();
+});
+(async()=>{
+  const {data}=await db.auth.getSession();
+  if(data.session){
+    user=data.session.user;
+    $("authCard").classList.add("hidden");
+    $("who").textContent=user.email;
+    await checkCouple();
+  }
+})();
 $("text").addEventListener("keydown",e=>{if(e.key==="Enter")addItem()});
+$("coupleCode").addEventListener("keydown",e=>{if(e.key==="Enter")createCouple()});
 </script>
 </body></html>
